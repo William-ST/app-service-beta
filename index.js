@@ -14,10 +14,10 @@ const pool = new Pool({
 
 app.get("/employee", async (req, res) => {
   try {
-    const [rows] = await pool.query("SELECT * FROM employee");
-    if (rows.length === 0)
+    const result = await pool.query("SELECT * FROM employee");
+    if (result.rows.length === 0)
       return res.status(404).json({ mensaje: "No se encontraron datos" });
-    res.json(rows);
+    res.json(result.rows);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -25,12 +25,12 @@ app.get("/employee", async (req, res) => {
 
 app.post("/employee", async (req, res) => {
   try {
-    const { name, lastname, speciality } = req.body;
+    const { name, lastname, specialty } = req.body;
 
     await pool.query(
       `INSERT INTO employee (name, lastname, speciality)
-       VALUES (?, ?, ?)`,
-      [name, lastname, speciality]
+       VALUES ($1, $2, $3)`,
+      [name, lastname, specialty]
     );
 
     res.status(201).json({ mensaje: "¡Empleado registrado!" });
